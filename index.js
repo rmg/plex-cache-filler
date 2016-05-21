@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+// Copyright Ryan Graham 2016. All Rights Reserved.
+// Node module: plex-cache-filler
+// This file is licensed under the MIT License.
+// License text available at https://opensource.org/licenses/MIT
 
 'use strict';
 
