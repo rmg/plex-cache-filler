@@ -7,8 +7,13 @@
 'use strict';
 
 var fs = require('fs');
-var PlexAPI = require('plex-api');
-var client = new PlexAPI(process.argv[2] || '127.0.0.1');
+var http = require('http');
+var parse = require('xml-parser');
+var req = {
+  hostname: process.argv[2] || '127.0.0.1',
+  port: 32400,
+  path: '/status/sessions',
+};
 
 var jobs = {};
 
@@ -16,23 +21,22 @@ setImmediate(scanAndCache);
 setInterval(scanAndCache, 15*1000);
 
 function scanAndCache() {
-  client.query('/status/sessions')
-        .then(getFiles)
-        .then(addJobs)
-        .then(summarize)
-        .catch(logErrors);
+  http.get(req, (res) => {
+    var body = '';
+    res.on('data', function(d) {
+      body += d;
+    }).on('end', function() {
+      var xml = parse(body);
+      var files = getFiles(xml);
+      files.forEach(addJob);
+      console.log('currently playing: ', files);
+      console.log('currently caching: ', Object.keys(jobs));
+    }).on('error', logErrors);
+  });
 }
 
-function summarize() {
-  console.log('currently caching: ', Object.keys(jobs));
-}
 function logErrors(err) {
   console.error('Error in caching:', err);
-}
-
-function addJobs(files) {
-  console.log('currently playing: ', files);
-  files.forEach(addJob);
 }
 
 function addJob(path) {
