@@ -1,6 +1,6 @@
 {
   "name": "plex-cache-filler",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Monitors Plex Media Server and ensures the currently playing media is in the fs cache.",
   "main": "index.js",
   "bin": "./index.js",
