@@ -1,0 +1,22 @@
+{
+  "name": "plex-cache-filler",
+  "version": "1.0.0",
+  "description": "Monitors Plex Media Server and ensures the currently playing media is in the fs cache.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rmg/plex-cache-filler.git"
+  },
+  "keywords": [
+    "plex"
+  ],
+  "author": "Ryan Graham",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rmg/plex-cache-filler/issues"
+  },
+  "homepage": "https://github.com/rmg/plex-cache-filler#readme"
+}
