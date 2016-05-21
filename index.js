@@ -7,7 +7,6 @@
 'use strict';
 
 var fs = require('fs');
-var pump = require('pump');
 var PlexAPI = require('plex-api');
 var client = new PlexAPI(process.argv[2] || '127.0.0.1');
 
@@ -47,12 +46,16 @@ function removeJob(path) {
 }
 
 function buffer(path) {
-  pump(fs.createReadStream(path), fs.createWriteStream('/dev/null'), cleanup);
+  fs.createReadStream(path)
+    .on('data', noop)
+    .on('close', cleanup)
+    .on('error', cleanup);
+
   function cleanup(err) {
     if (err) {
       console.error('error buffering %s: ', path, err);
     }
-    removeJob(path);
+    setTimeout(removeJob, 30*1000, path);
   }
 }
 
@@ -73,3 +76,5 @@ function getFiles(t, acc = []) {
   }
   return acc;
 }
+
+function noop() {}
