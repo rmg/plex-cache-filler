@@ -13,6 +13,7 @@ var client = new PlexAPI(process.argv[2] || '127.0.0.1');
 
 var jobs = {};
 
+setImmediate(scanAndCache);
 setInterval(scanAndCache, 15*1000);
 
 function scanAndCache() {
