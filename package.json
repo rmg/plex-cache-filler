@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Monitors Plex Media Server and ensures the currently playing media is in the fs cache.",
   "main": "index.js",
+  "bin": "./index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -18,5 +19,9 @@
   "bugs": {
     "url": "https://github.com/rmg/plex-cache-filler/issues"
   },
-  "homepage": "https://github.com/rmg/plex-cache-filler#readme"
+  "homepage": "https://github.com/rmg/plex-cache-filler#readme",
+  "dependencies": {
+    "plex-api": "^3.5.0",
+    "pump": "^1.0.1"
+  }
 }
