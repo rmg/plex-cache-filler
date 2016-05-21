@@ -60,7 +60,8 @@ function buffer(path) {
 }
 
 // Yep, this is recursive, but we know our tree is limited in depth
-function getFiles(t, acc = []) {
+function getFiles(t, acc) {
+  acc = acc || [];
   if (t instanceof Array) {
     t.forEach(function(i) {
       getFiles(i, acc);
