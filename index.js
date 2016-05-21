@@ -9,7 +9,7 @@
 var fs = require('fs');
 var pump = require('pump');
 var PlexAPI = require('plex-api');
-var client = new PlexAPI('127.0.0.1');
+var client = new PlexAPI(process.argv[2] || '127.0.0.1');
 
 var jobs = {};
 
