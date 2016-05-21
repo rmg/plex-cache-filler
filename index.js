@@ -32,6 +32,7 @@ function logErrors(err) {
 }
 
 function addJobs(files) {
+  console.log('currently playing: ', files);
   files.forEach(addJob);
 }
 
