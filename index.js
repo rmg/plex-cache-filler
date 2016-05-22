@@ -6,33 +6,37 @@
 
 'use strict';
 
-var fs = require('fs');
-var http = require('http');
-var parse = require('xml-parser');
-var req = {
+const fs = require('fs');
+const http = require('http');
+const parse = require('xml-parser');
+const bufKey = Symbol();
+const jobs = new Set();
+const req = {
   hostname: process.argv[2] || '127.0.0.1',
   port: 32400,
   path: '/status/sessions',
 };
 
-var jobs = {};
+setImmediate(http.get, req, handleResponse);
+setInterval(http.get, 15*1000, req, handleResponse);
 
-setImmediate(scanAndCache);
-setInterval(scanAndCache, 15*1000);
+function handleResponse(res) {
+  res[bufKey] = '';
+  res.on('data', accumulate);
+  res.on('end', parseResponse);
+  res.on('error', logErrors);
+}
 
-function scanAndCache() {
-  http.get(req, (res) => {
-    var body = '';
-    res.on('data', function(d) {
-      body += d;
-    }).on('end', function() {
-      var xml = parse(body);
-      var files = getFiles(xml);
-      files.forEach(addJob);
-      console.log('currently playing: ', files);
-      console.log('currently caching: ', Object.keys(jobs));
-    }).on('error', logErrors);
-  });
+function accumulate(d) {
+  this[bufKey] += d;
+}
+
+function parseResponse() {
+  const xml = parse(this[bufKey]);
+  const files = getFiles(xml, []);
+  files.forEach(addJob);
+  console.log('currently playing: ', files);
+  console.log('currently caching: ', Array.from(jobs));
 }
 
 function logErrors(err) {
@@ -40,16 +44,17 @@ function logErrors(err) {
 }
 
 function addJob(path) {
-  if (!(path in jobs)) {
-    jobs[path] = fs.createReadStream(path)
-                   .on('close', cleanup)
-                   .on('error', cleanup)
-                   .resume();
+  if (!jobs.has(path)) {
+    jobs.add(path);
+    fs.createReadStream(path)
+      .on('close', cleanup)
+      .on('error', cleanup)
+      .resume();
   }
 }
 
 function removeJob(path) {
-  delete jobs[path];
+  jobs.delete(path);
 }
 
 function cleanup(err) {
@@ -61,8 +66,7 @@ function cleanup(err) {
 
 // Yep, this is recursive, but we know our tree is limited in depth
 function getFiles(t, acc) {
-  acc = acc || [];
-  if (t instanceof Array || t instanceof Object) {
+  if (t !== null && typeof t === 'object') {
     for (let k in t) {
       if (k === 'file') {
         acc.push(t[k]);
