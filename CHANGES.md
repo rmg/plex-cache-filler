@@ -1,3 +1,13 @@
+2016-05-22, Version 1.1.1
+=========================
+
+ * const and cache all the things (Ryan Graham)
+
+ * inline and remove functions (Ryan Graham)
+
+ * better noop is no-noop (Ryan Graham)
+
+
 2016-05-21, Version 1.1.0
 =========================
 
