@@ -51,9 +51,9 @@ function removeJob(path) {
 
 function buffer(path) {
   fs.createReadStream(path)
-    .on('data', noop)
     .on('close', cleanup)
-    .on('error', cleanup);
+    .on('error', cleanup)
+    .resume();
 
   function cleanup(err) {
     if (err) {
@@ -81,5 +81,3 @@ function getFiles(t, acc) {
   }
   return acc;
 }
-
-function noop() {}
