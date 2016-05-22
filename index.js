@@ -41,7 +41,10 @@ function logErrors(err) {
 
 function addJob(path) {
   if (!(path in jobs)) {
-    jobs[path] = buffer(path);
+    jobs[path] = fs.createReadStream(path)
+                   .on('close', cleanup)
+                   .on('error', cleanup)
+                   .resume();
   }
 }
 
@@ -49,28 +52,17 @@ function removeJob(path) {
   delete jobs[path];
 }
 
-function buffer(path) {
-  fs.createReadStream(path)
-    .on('close', cleanup)
-    .on('error', cleanup)
-    .resume();
-
-  function cleanup(err) {
-    if (err) {
-      console.error('error buffering %s: ', path, err);
-    }
-    setTimeout(removeJob, 30*1000, path);
+function cleanup(err) {
+  if (err) {
+    console.error('error buffering %s: ', this.path, err);
   }
+  setTimeout(removeJob, 30*1000, this.path);
 }
 
 // Yep, this is recursive, but we know our tree is limited in depth
 function getFiles(t, acc) {
   acc = acc || [];
-  if (t instanceof Array) {
-    t.forEach(function(i) {
-      getFiles(i, acc);
-    });
-  } else if (t instanceof Object) {
+  if (t instanceof Array || t instanceof Object) {
     for (let k in t) {
       if (k === 'file') {
         acc.push(t[k]);
